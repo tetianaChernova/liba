@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+>
+<head>
+    <title>Books List</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+<h1>Create new book</h1>
+<form action="/books/save" method="post" enctype="multipart/form-data" modelAttribute="book">
+    <div class="form-group">
+        <input type="text"
+               class="form-control"
+               name="isbn"
+               placeholder="ISBN"
+               required="required">
+    </div>
+    <div class="form-group">
+        <input type="text"
+               class="form-control"
+               name="title"
+               placeholder="Title"
+               required="required">
+    </div>
+    <div class="form-group">
+        <input type="text"
+               class="form-control"
+               name="author"
+               placeholder="Author"
+               required="required">
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-info btn-lg btn-block">Create</button>
+    </div>
+</form>
+</body>
+</html>
