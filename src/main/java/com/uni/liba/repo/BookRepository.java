@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -43,5 +44,14 @@ public class BookRepository {
 		database.put("isbn2", Book.builder().isbn("isbn2").title("title2").author("author2").build());
 		database.put("isbn3", Book.builder().isbn("isbn3").title("title3").author("author3").build());
 		return database;
+	}
+
+	public Collection<Book> searchBook(String searchParam) {
+		return BOOK_DATABASE.values()
+				.stream()
+				.filter(book -> book.getIsbn().contains(searchParam)
+						|| book.getTitle().contains(searchParam)
+						|| book.getAuthor().contains(searchParam))
+				.collect(Collectors.toList());
 	}
 }

@@ -17,4 +17,6 @@ public interface BookService {
 	Collection<Book> getAll();
 
 	boolean isBookAlreadyExists(final String isbn);
+
+	Collection<Book> searchBook(String searchParam);
 }

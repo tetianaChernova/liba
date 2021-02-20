@@ -4,16 +4,18 @@ import com.uni.liba.exceptions.BookAlreadyExistsException;
 import com.uni.liba.model.Book;
 import com.uni.liba.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
 
-@Controller
+@RestController
 @RequestMapping("/books")
 public class BookController {
 
@@ -21,25 +23,23 @@ public class BookController {
 	private BookService bookService;
 
 	@GetMapping
-	public String getAllBooks(Model model) {
-		Collection<Book> books = bookService.getAll();
-		model.addAttribute("books", books);
-		return "books";
+	public ResponseEntity<Collection<Book>> getAllBooks() {
+		return ResponseEntity.ok(bookService.getAll());
 	}
 
-	@GetMapping("/save")
-	public String addNewBook() {
-		return "bookForm";
+	@GetMapping("/search")
+	public ResponseEntity<Collection<Book>> searchBooks(@RequestParam("searchParam") String searchParam) {
+		return ResponseEntity.ok(bookService.searchBook(searchParam));
 	}
 
 	@PostMapping("/save")
-	public String addNewBook(@ModelAttribute Book book) {
+	public ResponseEntity<?> addNewBook(@RequestBody Book book) {
 		try {
 			bookService.saveBook(book);
 		} catch (BookAlreadyExistsException e) {
-			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
-		return "redirect:/books";
+		return ResponseEntity.ok(bookService.getAll());
 	}
 
 }

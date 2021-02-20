@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Books List</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Font Awesome -->
+    <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+            rel="stylesheet"
+    />
+    <!-- Google Fonts -->
+    <link
+            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+            rel="stylesheet"
+    />
+    <!-- MDB -->
+    <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.2.0/mdb.min.css"
+            rel="stylesheet"
+    />
+</head>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<body>
+
+<h1>Books List</h1>
+<div class="input-group">
+    <div class="form-outline">
+        <input type="search" id="searchParam" name="searchParam" class="form-control"/>
+        <label class="form-label" for="searchParam">Search</label>
+    </div>
+    <button type="button" id="searchBooks" class="btn btn-info">
+        <i class="fas fa-search"></i>
+    </button>
+</div>
+<table class="table table-striped" style="margin-top: 2rem">
+    <thead>
+    <tr>
+        <th scope="col">Isbn</th>
+        <th scope="col">Title</th>
+        <th scope="col">Author</th>
+    </tr>
+    </thead>
+    <tbody id="books"></tbody>
+</table>
+
+<h1>Create new book</h1>
+<form action="/books/save" method="post" id="createBookForm" enctype="multipart/form-data" modelAttribute="book">
+    <div class="form-group">
+        <input type="text"
+               class="form-control"
+               name="isbn"
+               id="isbn"
+               placeholder="ISBN"
+               required="required">
+    </div>
+    <div class="form-group">
+        <input type="text"
+               class="form-control"
+               name="title"
+               id="title"
+               placeholder="Title"
+               required="required">
+    </div>
+    <div class="form-group">
+        <input type="text"
+               class="form-control"
+               name="author"
+               id="author"
+               placeholder="Author"
+               required="required">
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-info btn-lg btn-block">Create</button>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        // $('#getBooks').click(function(){
+
+        let books = $('#books');
+        books.empty();
+        $.ajax({
+            url: '/books',
+            success: function (response) {
+                parseBooks(response, books)
+            }
+        });
+    });
+
+    $('#createBookForm').submit(function (e) {
+        e.preventDefault();
+        // $('#loginResponse').text('');
+        $.ajax({
+            type: 'POST',
+            url: '/books/save',
+            dataType: 'json',
+            data: JSON.stringify({
+                isbn: $(this).find('[name=isbn]').val(),
+                title: $(this).find('[name=title]').val(),
+                author: $(this).find('[name=author]').val()
+            }),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Content-Type', 'application/json')
+            },
+            success: function (response) {
+                $('#isbn').val('');
+                $('#title').val('');
+                $('#author').val('');
+                let books = $('#books');
+                books.empty();
+                parseBooks(response, books)
+            },
+            error: function (response, status, error) {
+                $('#isbn').val('');
+                $('#title').val('');
+                $('#author').val('');
+                alert("Book already exists");
+            }
+        });
+    });
+
+    $('#searchBooks').click(function (response) {
+
+        let books = $('#books');
+        books.empty();
+        console.log("here")
+        $.ajax({
+            url: '/books/search?searchParam=' + $('#searchParam').val(),
+            success: function (response) {
+                $('#searchParam').val('');
+                parseBooks(response, books)
+            }
+        });
+    });
+
+    function parseBooks(response, books) {
+        return response.forEach(function (book) {
+            books.append('<tr>' +
+                '<td>' + book.isbn + '</td>' +
+                '<td>' + book.title + '</td>' +
+                '<td>' + book.author + '</td>' +
+                '</tr>');
+        })
+    }
+
+</script>
+<!-- MDB -->
+<script
+        type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.2.0/mdb.min.js"
+></script>
+</body>
+</html>

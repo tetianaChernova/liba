@@ -34,4 +34,9 @@ public class BookServiceImpl implements BookService {
 	public boolean isBookAlreadyExists(final String isbn) {
 		return bookRepository.isBookAlreadyExists(isbn);
 	}
+
+	@Override
+	public Collection<Book> searchBook(String searchParam) {
+		return bookRepository.searchBook(searchParam);
+	}
 }
