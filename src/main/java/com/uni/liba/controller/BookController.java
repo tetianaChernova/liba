@@ -32,14 +32,15 @@ public class BookController {
 		return ResponseEntity.ok(bookService.searchBook(searchParam));
 	}
 
-	@PostMapping("/save")
+	@PostMapping
 	public ResponseEntity<?> addNewBook(@RequestBody Book book) {
+		Book savedBook;
 		try {
-			bookService.saveBook(book);
+			savedBook = bookService.saveBook(book);
 		} catch (BookAlreadyExistsException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
-		return ResponseEntity.ok(bookService.getAll());
+		return ResponseEntity.ok(savedBook);
 	}
 
 }

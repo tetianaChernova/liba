@@ -77,8 +77,6 @@
 
 <script>
     $(document).ready(function () {
-        // $('#getBooks').click(function(){
-
         let books = $('#books');
         books.empty();
         $.ajax({
@@ -91,10 +89,9 @@
 
     $('#createBookForm').submit(function (e) {
         e.preventDefault();
-        // $('#loginResponse').text('');
         $.ajax({
             type: 'POST',
-            url: '/books/save',
+            url: '/books',
             dataType: 'json',
             data: JSON.stringify({
                 isbn: $(this).find('[name=isbn]').val(),
@@ -110,7 +107,12 @@
                 $('#author').val('');
                 let books = $('#books');
                 books.empty();
-                parseBooks(response, books)
+                $.ajax({
+                    url: '/books',
+                    success: function (response) {
+                        parseBooks(response, books)
+                    }
+                });
             },
             error: function (response, status, error) {
                 $('#isbn').val('');
@@ -125,7 +127,6 @@
 
         let books = $('#books');
         books.empty();
-        console.log("here")
         $.ajax({
             url: '/books/search?searchParam=' + $('#searchParam').val(),
             success: function (response) {
