@@ -20,23 +20,23 @@ public class BookServiceImpl implements BookService {
 		if (getBookById(bookToSave.getIsbn()).isPresent()) {
 			throw new BookAlreadyExistsException(bookToSave.getIsbn());
 		}
-		return bookRepository.saveBook(bookToSave);
+		return bookRepository.save(bookToSave);
 	}
 
 	public Optional<Book> getBookById(String isbn) {
-		return bookRepository.getBookById(isbn);
+		return bookRepository.findByIsbn(isbn);
 	}
 
 	public Collection<Book> getAll() {
-		return bookRepository.getAll();
+		return bookRepository.findAll();
 	}
 
 	public boolean isBookAlreadyExists(final String isbn) {
-		return bookRepository.isBookAlreadyExists(isbn);
+		return bookRepository.findByIsbn(isbn).isPresent();
 	}
 
 	@Override
 	public Collection<Book> searchBook(String searchParam) {
-		return bookRepository.searchBook(searchParam);
+		return bookRepository.findByTitleContainingOrAuthorContainingOrIsbnContaining(searchParam, searchParam, searchParam);
 	}
 }

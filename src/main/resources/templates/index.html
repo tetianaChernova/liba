@@ -45,7 +45,7 @@
 </table>
 
 <h1>Create new book</h1>
-<form action="/books/save" method="post" id="createBookForm" enctype="multipart/form-data" modelAttribute="book">
+<form action="rest/books/save" method="post" id="createBookForm" enctype="multipart/form-data" modelAttribute="book">
     <div class="form-group">
         <input type="text"
                class="form-control"
@@ -80,7 +80,7 @@
         let books = $('#books');
         books.empty();
         $.ajax({
-            url: '/books',
+            url: 'rest/books',
             success: function (response) {
                 parseBooks(response, books)
             }
@@ -91,7 +91,7 @@
         e.preventDefault();
         $.ajax({
             type: 'POST',
-            url: '/books',
+            url: 'rest/books',
             dataType: 'json',
             data: JSON.stringify({
                 isbn: $(this).find('[name=isbn]').val(),
@@ -128,7 +128,7 @@
         let books = $('#books');
         books.empty();
         $.ajax({
-            url: '/books/search?searchParam=' + $('#searchParam').val(),
+            url: 'rest/books/search?searchParam=' + $('#searchParam').val(),
             success: function (response) {
                 $('#searchParam').val('');
                 parseBooks(response, books)
@@ -139,7 +139,7 @@
     function parseBooks(response, books) {
         return response.forEach(function (book) {
             books.append('<tr>' +
-                '<td>' + book.isbn + '</td>' +
+                '<td><a href="/books/' + book.isbn + '">' + book.isbn + '</a></td>' +
                 '<td>' + book.title + '</td>' +
                 '<td>' + book.author + '</td>' +
                 '</tr>');
