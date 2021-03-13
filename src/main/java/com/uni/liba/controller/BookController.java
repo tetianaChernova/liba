@@ -4,6 +4,8 @@ import com.uni.liba.exceptions.BookAlreadyExistsException;
 import com.uni.liba.model.Book;
 import com.uni.liba.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,8 +32,11 @@ public class BookController {
 	}
 
 	@GetMapping("/search")
-	public ResponseEntity<Collection<Book>> searchBooks(@RequestParam("searchParam") String searchParam) {
-		return ResponseEntity.ok(bookService.searchBook(searchParam));
+	public ResponseEntity<Page<Book>> searchBooks(
+			@RequestParam("searchParam") String searchParam,
+			@RequestParam(value = "page", defaultValue = "1") Integer page,
+			@RequestParam(value = "size", defaultValue = "10") Integer size) {
+		return ResponseEntity.ok(bookService.searchBook(searchParam, PageRequest.of(page - 1, size)));
 	}
 
 	@GetMapping("/{isbn}")

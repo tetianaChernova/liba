@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -43,28 +45,33 @@ class BookControllerTest {
 				Book.builder().isbn("isbn2").title("title2").author("author2").build(),
 				Book.builder().isbn("isbn3").title("title3").author("author3").build());
 		when(bookService.getAll()).thenReturn(bookFromDB);
-		when(bookService.searchBook("testIsbn1")).thenReturn(Collections.singleton(testBook1));
+		when(bookService.searchBook("testIsbn1", PageRequest.of(0, 10)))
+				.thenReturn(new PageImpl<>(Collections.singletonList(testBook1)));
 		when(bookService.saveBook(testBook2)).thenReturn(testBook2);
 	}
 
 	@Test
 	void shouldSuccessfullyReturnAllBooks() throws Exception {
-		mockMvc.perform(get("/books"))
+		mockMvc.perform(get("/rest/books"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(bookFromDB)));
 	}
 
 	@Test
 	void shouldSuccessfullyReturnBooksBySearchParam() throws Exception {
-		mockMvc.perform(get("/books/search").param("searchParam", "testIsbn1"))
+		mockMvc.perform(get("/rest/books/search")
+				.param("searchParam", "testIsbn1")
+				.param("page", "1")
+				.param("size", "10"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(Collections.singletonList(testBook1))));
+				.andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(
+						new PageImpl<>(Collections.singletonList(testBook1)))));
 	}
 
 	@Test
 	void shouldSuccessfullySaveAndReturnSavedBook() throws Exception {
 		mockMvc.perform(
-				post("/books")
+				post("/rest/books")
 						.content(objectMapper.writeValueAsString(testBook2))
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isOk())

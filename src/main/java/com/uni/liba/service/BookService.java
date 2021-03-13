@@ -2,6 +2,8 @@ package com.uni.liba.service;
 
 import com.uni.liba.exceptions.BookAlreadyExistsException;
 import com.uni.liba.model.Book;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -16,7 +18,7 @@ public interface BookService {
 
 	Collection<Book> getAll();
 
-	boolean isBookAlreadyExists(final String isbn);
+	boolean isBookAlreadyExists(final String isbn, Pageable pageable);
 
-	Collection<Book> searchBook(String searchParam);
+	Page<Book> searchBook(String searchParam, Pageable pageable);
 }
