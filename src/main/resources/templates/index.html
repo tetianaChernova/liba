@@ -131,7 +131,7 @@
             url: 'rest/books/search?searchParam=' + $('#searchParam').val(),
             success: function (response) {
                 $('#searchParam').val('');
-                parseBooks(response, books)
+                parseBooks(response.content, books)
             }
         });
     });

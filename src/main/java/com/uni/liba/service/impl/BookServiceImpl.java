@@ -2,9 +2,13 @@ package com.uni.liba.service.impl;
 
 import com.uni.liba.exceptions.BookAlreadyExistsException;
 import com.uni.liba.model.Book;
+import com.uni.liba.model.Book_;
 import com.uni.liba.repo.BookRepository;
 import com.uni.liba.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -31,12 +35,18 @@ public class BookServiceImpl implements BookService {
 		return bookRepository.findAll();
 	}
 
-	public boolean isBookAlreadyExists(final String isbn) {
+	@Override
+	public boolean isBookAlreadyExists(String isbn, Pageable pageable) {
 		return bookRepository.findByIsbn(isbn).isPresent();
 	}
 
 	@Override
-	public Collection<Book> searchBook(String searchParam) {
-		return bookRepository.findByTitleContainingOrAuthorContainingOrIsbnContaining(searchParam, searchParam, searchParam);
+	public Page<Book> searchBook(String searchParam, Pageable pageable) {
+		Specification<Book> bookSpec = (root, query, criteriaBuilder) -> criteriaBuilder.or(
+				criteriaBuilder.like(root.get(Book_.ISBN), "%" + searchParam + "%"),
+				criteriaBuilder.like(root.get(Book_.AUTHOR), "%" + searchParam + "%"),
+				criteriaBuilder.like(root.get(Book_.TITLE), "%" + searchParam + "%")
+		);
+		return bookRepository.findAll(bookSpec, pageable);
 	}
 }
