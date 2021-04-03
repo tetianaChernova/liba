@@ -23,6 +23,23 @@
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <body>
 
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Navbar</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/books/fav">Favorites books</a>
+            </li>
+
+        </ul>
+    </div>
+</nav>
 <h1>Books List</h1>
 <div class="input-group">
     <div class="form-outline">
@@ -45,7 +62,7 @@
 </table>
 
 <h1>Create new book</h1>
-<form action="rest/books/save" method="post" id="createBookForm" enctype="multipart/form-data" modelAttribute="book">
+<form action="rest/books/" method="post" id="createBookForm" enctype="multipart/form-data" modelAttribute="book">
     <div class="form-group">
         <input type="text"
                class="form-control"
@@ -108,13 +125,17 @@
                 let books = $('#books');
                 books.empty();
                 $.ajax({
-                    url: '/books',
+                    url: 'rest/books/',
                     success: function (response) {
+                        console.log(response)
                         parseBooks(response, books)
                     }
                 });
             },
             error: function (response, status, error) {
+                // console.log(response)
+                // console.log(status)
+                // console.log(error)
                 $('#isbn').val('');
                 $('#title').val('');
                 $('#author').val('');
@@ -139,7 +160,7 @@
     function parseBooks(response, books) {
         return response.forEach(function (book) {
             books.append('<tr>' +
-                '<td><a href="/books/' + book.isbn + '">' + book.isbn + '</a></td>' +
+                '<td><a href="rest/books/' + book.isbn + '">' + book.isbn + '</a></td>' +
                 '<td>' + book.title + '</td>' +
                 '<td>' + book.author + '</td>' +
                 '</tr>');

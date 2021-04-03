@@ -2,6 +2,7 @@ package com.uni.liba.service.impl;
 
 import com.uni.liba.exceptions.BookAlreadyExistsException;
 import com.uni.liba.model.Book;
+import com.uni.liba.model.BookDto;
 import com.uni.liba.model.Book_;
 import com.uni.liba.repo.BookRepository;
 import com.uni.liba.service.BookService;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -31,8 +33,9 @@ public class BookServiceImpl implements BookService {
 		return bookRepository.findByIsbn(isbn);
 	}
 
-	public Collection<Book> getAll() {
-		return bookRepository.findAll();
+	public Collection<BookDto> getAll(String username) {
+		Collection<Book> favBooks = getAllFavBooks(username);
+		return bookRepository.findAll().stream().map(book -> new BookDto(book.getIsbn(), book.getAuthor(), book.getTitle(), favBooks.contains(book))).collect(Collectors.toList());
 	}
 
 	@Override
@@ -41,12 +44,30 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public Page<Book> searchBook(String searchParam, Pageable pageable) {
+	public Page<BookDto> searchBook(String username, String searchParam, Pageable pageable) {
 		Specification<Book> bookSpec = (root, query, criteriaBuilder) -> criteriaBuilder.or(
 				criteriaBuilder.like(root.get(Book_.ISBN), "%" + searchParam + "%"),
 				criteriaBuilder.like(root.get(Book_.AUTHOR), "%" + searchParam + "%"),
 				criteriaBuilder.like(root.get(Book_.TITLE), "%" + searchParam + "%")
 		);
-		return bookRepository.findAll(bookSpec, pageable);
+		Collection<Book> favBooks = getAllFavBooks(username);
+
+		return bookRepository.findAll(bookSpec, pageable).map(book -> new BookDto(book.getIsbn(), book.getAuthor(), book.getTitle(), favBooks.contains(book)));
+
+	}
+
+	@Override
+	public Collection<Book> getAllFavBooks(String username) {
+		return bookRepository.findAllFavBooks(username);
+	}
+
+	@Override
+	public void likeBook(String username, String isbn) {
+		bookRepository.likeBook(username, isbn);
+	}
+
+	@Override
+	public void unlikeBook(String username, String isbn) {
+		bookRepository.unlikeBook(username, isbn);
 	}
 }

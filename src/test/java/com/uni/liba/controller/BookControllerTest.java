@@ -44,9 +44,9 @@ class BookControllerTest {
 				Book.builder().isbn("isbn1").title("title1").author("author1").build(),
 				Book.builder().isbn("isbn2").title("title2").author("author2").build(),
 				Book.builder().isbn("isbn3").title("title3").author("author3").build());
-		when(bookService.getAll()).thenReturn(bookFromDB);
-		when(bookService.searchBook("testIsbn1", PageRequest.of(0, 10)))
-				.thenReturn(new PageImpl<>(Collections.singletonList(testBook1)));
+//		when(bookService.getAll()).thenReturn(bookFromDB);
+//		when(bookService.searchBook("testIsbn1", PageRequest.of(0, 10)))
+//				.thenReturn(new PageImpl<>(Collections.singletonList(testBook1)));
 		when(bookService.saveBook(testBook2)).thenReturn(testBook2);
 	}
 

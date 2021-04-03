@@ -2,6 +2,7 @@ package com.uni.liba.controller;
 
 import com.uni.liba.service.BookService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,5 +25,11 @@ public class MvcBookController {
 	public String bookPage(@PathVariable String isbn, Model model) {
 		model.addAttribute("book", bookService.getBookById(isbn).get());
 		return "bookPage";
+	}
+
+	@GetMapping("/books/fav")
+	public String favouritesPage(Authentication authentication, Model model) {
+		model.addAttribute("books", bookService.getAllFavBooks(authentication.getName()));
+		return "favourites";
 	}
 }
