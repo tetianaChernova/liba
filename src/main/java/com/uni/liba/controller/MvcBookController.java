@@ -28,8 +28,8 @@ public class MvcBookController {
 	}
 
 	@GetMapping("/books/fav")
-	public String favouritesPage(Authentication authentication, Model model) {
-		model.addAttribute("books", bookService.getAllFavBooks(authentication.getName()));
+	public String favourites(Authentication authentication, Model model) {
+		model.addAttribute("books", bookService.getFavouriteByUsername(authentication.getName()));
 		return "favourites";
 	}
 }

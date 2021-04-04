@@ -4,23 +4,32 @@ import com.uni.liba.exceptions.BookAlreadyExistsException;
 import com.uni.liba.model.Book;
 import com.uni.liba.model.BookDto;
 import com.uni.liba.model.Book_;
+import com.uni.liba.model.User;
 import com.uni.liba.repo.BookRepository;
+import com.uni.liba.repo.UserRepository;
 import com.uni.liba.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
+@Transactional
 public class BookServiceImpl implements BookService {
 
 	@Autowired
 	private BookRepository bookRepository;
+	@Autowired
+	private UserRepository userRepository;
 
 	public Book saveBook(final Book bookToSave) throws BookAlreadyExistsException {
 		if (getBookById(bookToSave.getIsbn()).isPresent()) {
@@ -34,8 +43,8 @@ public class BookServiceImpl implements BookService {
 	}
 
 	public Collection<BookDto> getAll(String username) {
-		Collection<Book> favBooks = getAllFavBooks(username);
-		return bookRepository.findAll().stream().map(book -> new BookDto(book.getIsbn(), book.getAuthor(), book.getTitle(), favBooks.contains(book))).collect(Collectors.toList());
+		Collection<Book> favBooks = getFavouriteByUsername(username);
+		return bookRepository.findAll().stream().map(book -> new BookDto(book.getIsbn(), book.getAuthor(), book.getTitle(), favBooks.contains(book))).collect(toList());
 	}
 
 	@Override
@@ -50,24 +59,32 @@ public class BookServiceImpl implements BookService {
 				criteriaBuilder.like(root.get(Book_.AUTHOR), "%" + searchParam + "%"),
 				criteriaBuilder.like(root.get(Book_.TITLE), "%" + searchParam + "%")
 		);
-		Collection<Book> favBooks = getAllFavBooks(username);
+		Collection<Book> favBooks = getFavouriteByUsername(username);
 
 		return bookRepository.findAll(bookSpec, pageable).map(book -> new BookDto(book.getIsbn(), book.getAuthor(), book.getTitle(), favBooks.contains(book)));
 
 	}
 
 	@Override
-	public Collection<Book> getAllFavBooks(String username) {
-		return bookRepository.findAllFavBooks(username);
+	public List<Book> getFavouriteByUsername(String username) {
+		return getUserByUsername(username).getLikedBooks();
 	}
 
 	@Override
 	public void likeBook(String username, String isbn) {
-		bookRepository.likeBook(username, isbn);
+		User userEntity = getUserByUsername(username);
+		userEntity.getLikedBooks().add(bookRepository.getOne(isbn));
 	}
 
 	@Override
 	public void unlikeBook(String username, String isbn) {
-		bookRepository.unlikeBook(username, isbn);
+		User userEntity = getUserByUsername(username);
+		userEntity.getLikedBooks().removeIf(book -> book.getIsbn().equals(isbn));
+	}
+
+
+	private User getUserByUsername(String username) {
+		return userRepository.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("Can't find user with such username:" + username));
 	}
 }

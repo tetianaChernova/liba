@@ -159,19 +159,41 @@
 
     function parseBooks(response, books) {
         return response.forEach(function (book) {
+            let id = "like".concat(book.isbn)
+            let fasFa = book.meliked ? "fas" : "far";
             books.append('<tr>' +
                 '<td><a href="rest/books/' + book.isbn + '">' + book.isbn + '</a></td>' +
                 '<td>' + book.title + '</td>' +
                 '<td>' + book.author + '</td>' +
+                '<td><div  id="' + id + '"><button onclick="change(' + book.isbn + ',' + !book.meliked + ')"><i class="' + fasFa +  ' fa-heart"></i></button></div></td></tr>' +
                 '</tr>');
         })
     }
 
-</script>
-<!-- MDB -->
-<script
+
+    $(function () {
+        change = function (isbn, liked) {
+            const id = "like".concat(isbn)
+            console.log(isbn)
+            console.log(liked)
+            console.log(id)
+            const heart = liked ? 'fas fa-heart' : 'far fa-heart'
+            const urlPart = liked ? 'like' : 'unlike'
+            $.ajax({
+                type: 'POST',
+                url: 'rest/books/' + isbn + '/' + urlPart,
+                contentType: "application/json",
+                data: JSON.stringify({isbn: isbn}),
+                success: function () {
+                    console.log("success")
+                }
+            });
+            $('#' + id).html('<div  id="' + id + '"><button onclick="change(' + isbn + ',' + !liked + ')"><i class="' + heart + '"></i></button></div>');
+        }
+    });
+
         type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.2.0/mdb.min.js"
-></script>
+</script>
 </body>
 </html>

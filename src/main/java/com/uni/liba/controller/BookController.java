@@ -50,22 +50,26 @@ public class BookController {
 				: ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
 
-
 	@PostMapping("/{isbn}/like")
 	public ResponseEntity<?> likeBook(@PathVariable("isbn") String isbn, Authentication authentication) {
 		Optional<Book> book = bookService.getBookById(isbn);
-		if (book.isPresent()){
+		if (book.isPresent()) {
 			bookService.likeBook(authentication.getName(), isbn);
 		}
 		return book.isPresent()
 				? ResponseEntity.ok().build()
-				:ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+				: ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
 
 	@PostMapping("/{isbn}/unlike")
 	public ResponseEntity<Void> unlikeBook(@PathVariable("isbn") String isbn, Authentication authentication) {
-		bookService.unlikeBook(isbn, authentication.getName());
-		return ResponseEntity.ok().build();
+		Optional<Book> book = bookService.getBookById(isbn);
+		if (book.isPresent()) {
+			bookService.unlikeBook(authentication.getName(), isbn);
+		}
+		return book.isPresent()
+				? ResponseEntity.ok().build()
+				: ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
 
 
@@ -79,10 +83,9 @@ public class BookController {
 		}
 		return ResponseEntity.ok(savedBook);
 	}
-
 	@GetMapping("/fav")
 	public ResponseEntity<?> favBooks(Authentication authentication) {
-		return ResponseEntity.ok(bookService.getAllFavBooks(authentication.getName()));
+		return ResponseEntity.ok(bookService.getFavouriteByUsername(authentication.getName()));
 	}
 
 }
