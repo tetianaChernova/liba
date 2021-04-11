@@ -22,11 +22,18 @@
             <label for="username">username</label>
             <input type="text" class="form-control" id="username"
                    th:field="*{username}" placeholder="Enter username" required>
+            <p th:each="error : ${#fields.errors('username')}"
+               th:text="${error}" style="color:red">Validation error</p>
         </div>
         <div class="form-group">
             <label for="password">password</label>
             <input type="text" class="form-control" id="password"
                    th:field="*{password}" placeholder="Enter password" required>
+            <p th:each="error : ${#fields.errors('password')}"
+               th:text="${error}" style="color:red">Validation error</p>
+        </div>
+        <div th:if="${userExistsError != null}">
+            <p th:text="${userExistsError}" style="color:red"></p>
         </div>
         <button type="submit" class="btn btn-primary">Save</button>
     </form>

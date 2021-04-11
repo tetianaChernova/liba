@@ -1,6 +1,7 @@
 package com.uni.liba.service.impl;
 
 import com.uni.liba.model.User;
+import com.uni.liba.model.UserDto;
 import com.uni.liba.repo.UserRepository;
 import com.uni.liba.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 
-@Service
+@Service("userServiceImpl")
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
@@ -28,10 +29,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean addUser(User user) {
+	public boolean addUser(UserDto user) {
 		if (userRepository.findByUsername(user.getUsername()).isEmpty()) {
-			user.setPassword(passwordEncoder.encode(user.getPassword()));
-			userRepository.save(user);
+			User userToSave = new User();
+			userToSave.setUsername(user.getUsername());
+			userToSave.setPassword(passwordEncoder.encode(user.getPassword()));
+			userRepository.save(userToSave);
 			return true;
 		} else {
 			return false;
@@ -50,7 +53,7 @@ public class UserServiceImpl implements UserService {
 	private void initDatabase() {
 		userRepository.save(User.builder()
 				.username("admin")
-				.password(passwordEncoder.encode("123"))
+				.password(passwordEncoder.encode("12345678"))
 				.build()
 		);
 	}

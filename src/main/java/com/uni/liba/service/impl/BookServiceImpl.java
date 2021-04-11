@@ -31,15 +31,21 @@ public class BookServiceImpl implements BookService {
 	@Autowired
 	private UserRepository userRepository;
 
-	public Book saveBook(final Book bookToSave) throws BookAlreadyExistsException {
+	public Book saveBook(final BookDto bookToSave) throws BookAlreadyExistsException {
 		if (getBookById(bookToSave.getIsbn()).isPresent()) {
 			throw new BookAlreadyExistsException(bookToSave.getIsbn());
 		}
-		return bookRepository.save(bookToSave);
+		Book book = Book.builder()
+				.isbn(bookToSave.getIsbn())
+				.title(bookToSave.getTitle())
+				.author(bookToSave.getAuthor())
+				.build();
+		return bookRepository.save(book);
 	}
 
-	public Optional<Book> getBookById(String isbn) {
-		return bookRepository.findByIsbn(isbn);
+	public Optional<BookDto> getBookById(String isbn) {
+		Optional<Book> book = bookRepository.findByIsbn(isbn);
+		return book.map(value -> BookDto.builder().isbn(value.getIsbn()).title(value.getTitle()).author(value.getAuthor()).build());
 	}
 
 	public Collection<BookDto> getAll(String username) {

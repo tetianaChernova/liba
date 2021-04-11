@@ -25,7 +25,8 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#">Navbar</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
@@ -68,24 +69,24 @@
                class="form-control"
                name="isbn"
                id="isbn"
-               placeholder="ISBN"
-               required="required">
+               placeholder="ISBN">
+        <div id="isbnError"></div>
     </div>
     <div class="form-group">
         <input type="text"
                class="form-control"
                name="title"
                id="title"
-               placeholder="Title"
-               required="required">
+               placeholder="Title">
+        <div id="titleError"></div>
     </div>
     <div class="form-group">
         <input type="text"
                class="form-control"
                name="author"
                id="author"
-               placeholder="Author"
-               required="required">
+               placeholder="Author">
+        <div id="authorError"></div>
     </div>
     <div class="form-group">
         <button type="submit" class="btn btn-info btn-lg btn-block">Create</button>
@@ -113,33 +114,36 @@
             data: JSON.stringify({
                 isbn: $(this).find('[name=isbn]').val(),
                 title: $(this).find('[name=title]').val(),
-                author: $(this).find('[name=author]').val()
+                author: $(this).find('[name=author]').val(),
+                meliked: false
             }),
             beforeSend: function (xhr) {
                 xhr.setRequestHeader('Content-Type', 'application/json')
             },
             success: function (response) {
-                $('#isbn').val('');
-                $('#title').val('');
-                $('#author').val('');
                 let books = $('#books');
-                books.empty();
-                $.ajax({
-                    url: 'rest/books/',
-                    success: function (response) {
-                        console.log(response)
-                        parseBooks(response, books)
-                    }
-                });
-            },
-            error: function (response, status, error) {
-                // console.log(response)
-                // console.log(status)
-                // console.log(error)
+                parseBooks(new Array(response), books)
+                $('#isbnError').html('')
+                $('#titleError').html('')
+                $('#authorError').html('')
                 $('#isbn').val('');
                 $('#title').val('');
                 $('#author').val('');
-                alert("Book already exists");
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                $('#isbn').val('');
+                $('#title').val('');
+                $('#author').val('');
+
+                console.log(xhr.responseJSON)
+                if (xhr.responseJSON === undefined || xhr.responseJSON === null || Object.entries(xhr.responseJSON).length === 0) {
+                    alert("Book already exists");
+                }
+                else {
+                    for (const [key, value] of Object.entries(xhr.responseJSON)) {
+                        $(`#${key}`).html(`<p style="color:red">${value}</p>`)
+                    }
+                }
             }
         });
     });
@@ -165,7 +169,7 @@
                 '<td><a href="rest/books/' + book.isbn + '">' + book.isbn + '</a></td>' +
                 '<td>' + book.title + '</td>' +
                 '<td>' + book.author + '</td>' +
-                '<td><div  id="' + id + '"><button onclick="change(' + book.isbn + ',' + !book.meliked + ')"><i class="' + fasFa +  ' fa-heart"></i></button></div></td></tr>' +
+                '<td><div  id="' + id + '"><button onclick="change(' + book.isbn + ',' + !book.meliked + ')"><i class="' + fasFa + ' fa-heart"></i></button></div></td></tr>' +
                 '</tr>');
         })
     }
@@ -192,8 +196,8 @@
         }
     });
 
-        type="text/javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.2.0/mdb.min.js"
+    type = "text/javascript"
+    src = "https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.2.0/mdb.min.js"
 </script>
 </body>
 </html>

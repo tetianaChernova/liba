@@ -14,9 +14,9 @@ import java.util.Optional;
 @Service
 public interface BookService {
 
-	Book saveBook(final Book bookToSave) throws BookAlreadyExistsException;
+	Book saveBook(final BookDto bookToSave) throws BookAlreadyExistsException;
 
-	Optional<Book> getBookById(String isbn);
+	Optional<BookDto> getBookById(String isbn);
 
 	Collection<BookDto> getAll(String username);
 

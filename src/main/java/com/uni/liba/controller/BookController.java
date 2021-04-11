@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -44,7 +45,7 @@ public class BookController {
 
 	@GetMapping("/{isbn}")
 	public ResponseEntity<?> getById(@PathVariable("isbn") String isbn) {
-		Optional<Book> book = bookService.getBookById(isbn);
+		Optional<BookDto> book = bookService.getBookById(isbn);
 		return book.isPresent()
 				? ResponseEntity.ok(book.get())
 				: ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -52,7 +53,7 @@ public class BookController {
 
 	@PostMapping("/{isbn}/like")
 	public ResponseEntity<?> likeBook(@PathVariable("isbn") String isbn, Authentication authentication) {
-		Optional<Book> book = bookService.getBookById(isbn);
+		Optional<BookDto> book = bookService.getBookById(isbn);
 		if (book.isPresent()) {
 			bookService.likeBook(authentication.getName(), isbn);
 		}
@@ -63,7 +64,7 @@ public class BookController {
 
 	@PostMapping("/{isbn}/unlike")
 	public ResponseEntity<Void> unlikeBook(@PathVariable("isbn") String isbn, Authentication authentication) {
-		Optional<Book> book = bookService.getBookById(isbn);
+		Optional<BookDto> book = bookService.getBookById(isbn);
 		if (book.isPresent()) {
 			bookService.unlikeBook(authentication.getName(), isbn);
 		}
@@ -74,7 +75,7 @@ public class BookController {
 
 
 	@PostMapping
-	public ResponseEntity<?> addNewBook(@RequestBody Book book) {
+	public ResponseEntity<?> addNewBook(@RequestBody @Valid BookDto book) {
 		Book savedBook;
 		try {
 			savedBook = bookService.saveBook(book);
