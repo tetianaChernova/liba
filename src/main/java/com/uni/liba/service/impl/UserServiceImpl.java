@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 
-@Service("userServiceImpl")
+@Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 

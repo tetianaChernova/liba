@@ -1,6 +1,6 @@
 package com.uni.liba.controller;
 
-import com.uni.liba.model.Book;
+import com.uni.liba.model.BookDto;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.hamcrest.CoreMatchers;
@@ -13,9 +13,10 @@ import org.springframework.http.HttpStatus;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class BookControllerIntegrationTest {
-	private Book testBook;
+	private BookDto testBook;
 
 	@LocalServerPort
 	void savePort(int port) {
@@ -23,8 +24,8 @@ public class BookControllerIntegrationTest {
 	}
 
 	@BeforeEach
-	void setUp(){
-		testBook = Book.builder().isbn("isbn").title("title").author("author").build();
+	void setUp() {
+		testBook = BookDto.builder().isbn("9781566199094").title("title").author("author").meliked(false).build();
 	}
 
 	@Test
@@ -34,7 +35,7 @@ public class BookControllerIntegrationTest {
 				.body(testBook)
 				.contentType(ContentType.JSON)
 				.when()
-				.post("/books/")
+				.post("rest/books/")
 				.then()
 				.statusCode(HttpStatus.OK.value())
 				.body("isbn", CoreMatchers.is(testBook.getIsbn()))
@@ -48,10 +49,10 @@ public class BookControllerIntegrationTest {
 				.given()
 				.contentType(ContentType.JSON)
 				.when()
-				.get("/books")
+				.get("rest/books")
 				.then()
 				.statusCode(HttpStatus.OK.value())
-				.body("", hasItems(hasEntry("isbn", "isbn1"), hasEntry("title", "title1"), hasEntry("author", "author1")), "",
+				.body("", hasItems(hasEntry("isbn", "9781566199094"), hasEntry("title", "title1"), hasEntry("author", "author1")), "",
 						hasItems(hasEntry("isbn", "isbn2"), hasEntry("title", "title2"), hasEntry("author", "author2")), "",
 						hasItems(hasEntry("isbn", "isbn3"), hasEntry("title", "title3"), hasEntry("author", "author3")));
 	}
@@ -63,7 +64,7 @@ public class BookControllerIntegrationTest {
 				.queryParam("searchParam", "title1")
 				.contentType(ContentType.JSON)
 				.when()
-				.get("books/search")
+				.get("rest/books/search")
 				.then()
 				.statusCode(200)
 				.body("size()", is(1));
